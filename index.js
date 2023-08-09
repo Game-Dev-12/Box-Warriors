@@ -9,34 +9,6 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 const gravity = 2
 
 class Sprite {
-    constructor({position, imageSrc}) {
-       this.position = position
-       this.height = 150
-       this.width =  50
-       this.image = new Image()
-       this.image.src = imageSrc
-       
-    }
-    
-    draw(){
-        c.drawImage(this.image, this.position.x,this.position.y)
-    }
-    
-    update(){
-        this.draw()
-       
-    }
-    
-}
-const background = new Sprite({ //  takes position and set background image
-    position:{
-    x:0,
-    y:0
-    },
-    imageSrc:'./images/Background.png'
-   
-})
-class Fighter {
     constructor({position,velocity, color = 'red', offset}) {
        this.position = position
        this.velocity = velocity
@@ -62,7 +34,6 @@ class Fighter {
         c.fillStyle = this.color
         c.fillRect(this.position.x,this.position.y, this.width ,this.height)
         //attackRect
-        console.log("test for draw")
         if(this.isAttacking) {
             c.fillStyle = 'green'
             c.fillRect(
@@ -77,7 +48,7 @@ class Fighter {
         this.draw()
         this.attackBox.position.x = this.position.x + this.attackBox.offset.x
         this.attackBox.position.y = this.position.y 
-        console.log("this is being called")
+        
         this.position.x +=this.velocity.x 
         this.position.y +=this.velocity.y 
         if(this.position.y + this.height + this.velocity.y >= canvas.height){
@@ -94,7 +65,8 @@ class Fighter {
         }, 100)
     }
 }
-const player = new Fighter({
+
+const player = new Sprite({
     position:{
     x:0,
     y:0
@@ -112,7 +84,7 @@ const player = new Fighter({
 
 
 
-const enemy = new Fighter({
+const enemy = new Sprite({
     position:{
     x:972,
     y:130
@@ -192,9 +164,9 @@ function animate(){
     window.requestAnimationFrame(animate)
     c.fillStyle ='black'
     c.fillRect(0,0,canvas.width, canvas.height)
-    background.update()
     player.update()
     enemy.update()
+    
     player.velocity.x = 0
     enemy.velocity.x = 0
     

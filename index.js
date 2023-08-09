@@ -8,34 +8,50 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 
 const gravity = 2
 
+
+//classes
+//creates all instances of animation
 class Sprite {
-    constructor({position, imageSrc}) {
+    constructor({position, imageSrc, scale = 1, framesMax = 1}) {
        this.position = position
        this.height = 150
        this.width =  50
-       this.image = new Image()
+       this.image = document.createElement('img')
        this.image.src = imageSrc
-       
+       this.scale = scale;
+       this.framesMax = framesMax;
+       this.framesCurrent = 0;
+       this.framesElapsed = 0;
+       this.framesHold = 10;
     }
     
-    draw(){
-        c.drawImage(this.image, this.position.x,this.position.y)
-    }
+    draw(){ 
+        c.drawImage(
+            this.image,
+            this.framesCurrent * (this.image.width / this.framesMax),
+            0,
+            this.image.width / this.framesMax,
+            this.image.height,
+            this.position.x,
+            this.position.y, 
+            (this.image.width / this.framesMax ) * this.scale, 
+            this.image.height * this.scale
+            )}
     
     update(){
         this.draw()
-       
+        this.framesElapsed ++
+        
+        if (this.framesElapsed % this.framesHold === 0){
+            if(this.framesCurrent < this.framesMax - 1){
+                this.framesCurrent++
+            }else  {
+                this.framesCurrent = 0;
+            }     
+        }
     }
-    
 }
-const background = new Sprite({ //  takes position and set background image
-    position:{
-    x:0,
-    y:0
-    },
-    imageSrc:'./images/Background.png'
-   
-})
+//specifically for the players
 class Fighter {
     constructor({position,velocity, color = 'red', offset}) {
        this.position = position
@@ -93,6 +109,27 @@ class Fighter {
         }, 100)
     }
 }
+
+
+//sprites
+const background = new Sprite({ //  takes position and set background image
+    position:{
+    x:0,
+    y:0
+    },
+    imageSrc:'./images/Background.png'
+   
+})
+
+const bat = new Sprite({ //  takes position and set background image
+    position:{
+    x: 50,
+    y: 100
+    },
+    imageSrc:'./images/bat.png',
+    framesMax: 5
+})
+
 const player = new Fighter({
     position:{
     x:0,
@@ -108,7 +145,6 @@ const player = new Fighter({
     }
     
 })
-
 
 
 const enemy = new Fighter({
@@ -147,6 +183,8 @@ const keys = {
     }
 }
 
+
+//functionality
 //the rectangle parameters represent player1 & player2
 function rectangularCollision({rectangle1, rectangle2}){
     return (
@@ -157,6 +195,8 @@ function rectangularCollision({rectangle1, rectangle2}){
     )
 }
 
+
+//takes in cuurent health and waits for a winner, if the timer runs out before a winner there is a tie
 function determineWinner({player, enemy, timerId}) {
         gameOver = true
         document.querySelector('#displayText').style.display = 'flex'
@@ -171,6 +211,11 @@ function determineWinner({player, enemy, timerId}) {
         }
 }
 let gameOver = false 
+
+
+
+
+//timer function
 let timer = 60
 let timerId
 function decreaseTimer() {
@@ -187,11 +232,14 @@ function decreaseTimer() {
 }
 decreaseTimer()
 
+
+//animation
 function animate(){
     window.requestAnimationFrame(animate)
     c.fillStyle ='black'
     c.fillRect(0,0,canvas.width, canvas.height)
     background.update()
+    bat.update()
     player.update()
     enemy.update()
     player.velocity.x = 0
@@ -278,6 +326,8 @@ function animate(){
 
 animate()
 
+
+//event listner adding action
 window.addEventListener('keydown', (event) => {
     switch(event.key){
         case 'd':
@@ -311,7 +361,7 @@ window.addEventListener('keydown', (event) => {
             break
     }
 })
-
+//event listner undoing action
 window.addEventListener('keyup', (event) => {
     switch(event.key) {
         case 'd':
